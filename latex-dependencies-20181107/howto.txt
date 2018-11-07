@@ -1,0 +1,6 @@
+Die Quellen der einzelnen Übungsblätter liegen im Bereich der entsprechenden Woche vor (blattXX-public.tex) und können zusammen mit dem Inhalt des Ordners "latex-dependencies" 
+mit dem folgenden Befehl gebaut werden (XX ist durch die Nummer des entsprechenden Übungsblatts zu ersetzen):
+
+pdflatex -shell-escape blattXX-public.tex
+
+

@@ -1,0 +1,50 @@
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{amsmath,amsthm}
+\usepackage{stmaryrd}
+\usepackage{multirow}
+% \usepackage{mathpartir}
+\usepackage{mathtools}
+\usepackage{braket}
+\usepackage{minted}
+\usepackage{tikz}
+
+\usetikzlibrary{calc,positioning,shapes}
+
+\definecolor{cyan3}{rgb}{0,.59,.59}
+\newcommand{\R}{{\color{cyan3}\null\Rightarrow\null}}
+\newcommand{\RedPlus}{\mathbin{\color{red}+}}
+\newcommand{\RedMinus}{\mathbin{\color{red}-}}
+\newcommand{\RedMult}{\mathbin{\color{red}*}}
+\newcommand{\RedEqual}{\mathbin{\color{red}=}}
+\newcommand{\semT}[1]{\llbracket{}\texttt{#1}\rrbracket{}}
+\newcommand{\WP}[1]{\textsf{WP}\semT{#1}}
+\newcommand{\false}{\texttt{false}}
+\newcommand{\true}{\texttt{true}}
+\newcommand{\mio}[1]{\mintinline{ocaml}{#1}}
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\mic}[1]{\mintinline{c}{#1}}
+\newcommand{\mij}[1]{\mintinline{java}{#1}}
+\newcommand{\squote}[1]{``#1''}
+\newcommand{\hint}[1]{\textit{Hinweis: #1}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\defequiv}{:\equiv}
+\newcommand{\equivdef}{\equiv:}
+\newcommand{\tform}[1]{&&\mbox{\textit{\small{#1}}}}
+\newcommand{\verticalline}{\noindent{\hrulefill\\}}
+
+\ExplSyntaxOn
+\tl_gset:Nn \g_tumteaching_lecture_tl {Functional~Programming~and~Verification}
+\tl_gset:Nn \g_tumteaching_teacher_tl {Prof.~Dr.~H.~Seidl}
+\tl_gset:Nn \g_tumteaching_instructor_tl {,~N.~Hartmann,~R.~Vogler}
+\ExplSyntaxOff
+
+\newcommand\ocamlDisclaimer{%
+  \noindent\fbox{\parbox{\dimexpr\linewidth-2.1\fboxsep-\fboxrule\relax}{\vspace{2pt}%
+  \textbf{OCaml-Hausaufgaben die nicht kompilieren oder nicht in annehmbarer Zeit terminieren werden nicht gewertet!}\par}}}

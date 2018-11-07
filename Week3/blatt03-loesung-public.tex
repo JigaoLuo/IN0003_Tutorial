@@ -1,0 +1,783 @@
+\documentclass[
+  %solution,
+  english
+	%german
+]{tumteaching}
+
+\usepackage{listings}
+\usepackage{paralist}
+
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{braket}
+\usepackage[inline]{enumitem}
+\usepackage{amsmath,amsthm}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{centernot}
+\usepackage{multicol}
+\usepackage{adjustbox}
+\usepackage{ltablex}
+
+\usepackage{info2}
+
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{shapes.callouts}
+
+\tikzset{snake it/.style={decorate, decoration=snake}}
+
+\ExplSyntaxOn%
+\tl_gset:Nn \g_tumteaching_date_tl {WS~2018/19}
+\tl_gset:Nn \g_tumteaching_exsheet_nr_tl {3}
+\tl_gset:Nn \g_tumteaching_exsheet_deadline_tl {11.11.2018}
+\ExplSyntaxOff%
+
+\newcommand{\objective}[1]{\item \small{#1}}
+%\newcommand{\mydottedline}[0]{...}
+\newcommand{\mydotline}{\makebox[2.0in]{\dotfill}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+
+\begin{document}
+
+\verticalline
+\begin{disclaimer}{General Information}
+	Detailed information about the lecture, tutorials and homework assignments can be found on the lecture website\footnote{\url{https://www.in.tum.de/i02/lehre/wintersemester-1819/vorlesungen/functional-programming-and-verification/}}. Solutions have to be submitted to Moodle\footnote{\url{https://www.moodle.tum.de/course/view.php?id=44932}}. Make sure your uploaded documents are readable. Blurred images will be rejected. Use Piazza\footnote{\url{https://piazza.com/tum.de/fall2018/in0003/home}} to ask questions and discuss with your fellow students.
+\end{disclaimer}
+
+\verticalline
+
+\begin{disclaimer}{Loop Invariants}
+	In this exercise sheet, you will discuss and practice different strategies to find suitable loop invariants. For additional insight, tips and tricks on how to find a good invariant, we recommend watching the recording of last year's exercise on this particular topic\footnote{\url{http://ttt.in.tum.de/recordings/Info2_2017_11_24-1/Info2_2017_11_24-1.mp4}}.
+\end{disclaimer}
+
+\verticalline
+
+\begin{assignment}[L]{Individual Loops}
+	Inspect the following loops and discuss the preconditions that have to hold, such that the assertion $i = n$ is satisfied. In particular, discuss the results for positive and negative inputs, respectively.
+	
+	\begin{tabularx}{\textwidth}{XXX}
+		1.~~
+		
+		\begin{tikzpicture}[scale=0.8]
+\node[coordinate](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$i = 0$};
+\path[->](start) edge [] node [right]{} (assignment_0);
+\node[below=of assignment_0.south, circle, draw, yshift=3mm](loop_1_join){};
+\path[->](assignment_0) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_join.south, diamond, draw, yshift=3mm, scale=0.85](loop_1_fork){$i == n$};
+\path[->](loop_1_join) edge [] node [right]{} (loop_1_fork);
+\draw let \p1=(loop_1_fork.west) in let \p2=(loop_1_fork.west) in node[coordinate](loop_1_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$yes$} (loop_1_fork_angle_l);
+\draw let \p1=(loop_1_fork.east) in let \p2=(loop_1_fork.east) in node[coordinate](loop_1_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$no$} (loop_1_fork_angle_r);
+\node[above=of loop_1_fork_angle_r.north, rectangle, draw, yshift=-3mm](assignment_2){$i = i+2$};
+\path[->](loop_1_fork_angle_r) edge [] node [right]{} (assignment_2);
+\draw let \p1=(assignment_2.north) in let \p2=(loop_1_join) in node[coordinate](loop_1_back_edge_angle1) at (\x1+0mm, \y2+0mm) {};
+\path[-](assignment_2) edge [] node [right]{} (loop_1_back_edge_angle1);
+\path[->](loop_1_back_edge_angle1) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_fork_angle_l.south, coordinate,yshift=3mm](stop){Stop};
+\path[->](loop_1_fork_angle_l) edge [] node [left]{$i = n$} (stop);		
+		\end{tikzpicture} &
+		2.~~
+		
+		\begin{tikzpicture}[scale=0.8]
+\node[coordinate](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$i = 0$};
+\path[->](start) edge [] node [right]{} (assignment_0);
+\node[below=of assignment_0.south, circle, draw, yshift=3mm](loop_1_join){};
+\path[->](assignment_0) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_join.south, diamond, draw, yshift=3mm,scale=0.85](loop_1_fork){$i >= n$};
+\path[->](loop_1_join) edge [] node [right]{} (loop_1_fork);
+\draw let \p1=(loop_1_fork.west) in let \p2=(loop_1_fork.west) in node[coordinate](loop_1_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$yes$} (loop_1_fork_angle_l);
+\draw let \p1=(loop_1_fork.east) in let \p2=(loop_1_fork.east) in node[coordinate](loop_1_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$no$} (loop_1_fork_angle_r);
+\node[above=of loop_1_fork_angle_r.north, rectangle, draw, yshift=-3mm](assignment_2){$i = i+1$};
+\path[->](loop_1_fork_angle_r) edge [] node [right]{} (assignment_2);
+\draw let \p1=(assignment_2.north) in let \p2=(loop_1_join) in node[coordinate](loop_1_back_edge_angle1) at (\x1+0mm, \y2+0mm) {};
+\path[-](assignment_2) edge [] node [right]{} (loop_1_back_edge_angle1);
+\path[->](loop_1_back_edge_angle1) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_fork_angle_l.south, coordinate,yshift=3mm](stop){Stop};
+\path[->](loop_1_fork_angle_l) edge [] node [left]{$i = n$} (stop);		
+		\end{tikzpicture}&
+		3.~~
+		
+		\begin{tikzpicture}[scale=0.8]
+\node[coordinate](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$i = 0$};
+\path[->](start) edge [] node [right]{} (assignment_0);
+\node[below=of assignment_0.south, circle, draw, yshift=3mm](loop_1_join){};
+\path[->](assignment_0) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_join.south, diamond, draw, yshift=3mm,scale=0.85](loop_1_fork){$i >= n$};
+\path[->](loop_1_join) edge [] node [right]{} (loop_1_fork);
+\draw let \p1=(loop_1_fork.west) in let \p2=(loop_1_fork.west) in node[coordinate](loop_1_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$yes$} (loop_1_fork_angle_l);
+\draw let \p1=(loop_1_fork.east) in let \p2=(loop_1_fork.east) in node[coordinate](loop_1_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$no$} (loop_1_fork_angle_r);
+\node[above=of loop_1_fork_angle_r.north, rectangle, draw, yshift=-3mm](assignment_2){$i = i+2$};
+\path[->](loop_1_fork_angle_r) edge [] node [right]{} (assignment_2);
+\draw let \p1=(assignment_2.north) in let \p2=(loop_1_join) in node[coordinate](loop_1_back_edge_angle1) at (\x1+0mm, \y2+0mm) {};
+\path[-](assignment_2) edge [] node [right]{} (loop_1_back_edge_angle1);
+\path[->](loop_1_back_edge_angle1) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_fork_angle_l.south, coordinate,yshift=3mm](stop){Stop};
+\path[->](loop_1_fork_angle_l) edge [] node [left]{$i = n$} (stop);		
+		\end{tikzpicture}
+	\end{tabularx} 
+	
+	%@@@ BEGIN_SOLUTION
+	\begin{solution}
+		\begin{enumerate}
+			\item In the first case, the assertion follows from the loop condition, immediately. Regardless of what is true before or within the loop, whenever the loop is left, $i = n$ holds. For $n < 0$ the loop does not terminate. However, this does not violate the assertion! Same holds for $n \centernot \equiv 0 mod 2$. Thus $true$ is a sufficient precondition:
+			\begin{align*}
+				&\WP{i == n}(true, i = n)\\
+				\equiv\;& (i \neq n \implies true) \land (i = n \implies i = n)\\
+				\equiv\;& true\\
+			\end{align*}
+		
+			\item Intuitively, we recognize that the loop terminates when $i$ reaches $n$ and thus $i = n$ holds. However, for $n < 0$, the situation is different. In this case the exit of the loop is reached immediately with $i \neq n$. In order to exclude these runs of the program, we have to make sure that $n \geq 0$ (or more generally $n \geq i$) holds before the loop:
+			\begin{align*}
+				&\WP{i = i + 1}(n \geq i)\\
+				\equiv\;& n \geq i + 1\\
+				&\\
+				&\WP{i >= n}(n \geq i + 1, i = n)\\
+				\equiv\;& (i < n \implies n \geq i + 1) \land (i \geq n \implies i = n)\\
+				\equiv\;& i \geq n \implies i = n\\
+				\equiv\;& i < n \lor i = n\\
+				\equiv\;& i \leq n \impliedby n \geq i\\
+			\end{align*}
+			
+			\item For $n < 0$, the same problem arises, so we require $n \geq i$ before the loop. Moreover, the loop may be reached with an $i = n - 1$. In this case the program would increment $i$ to $i = n + 1$ and reach the exit with $i \neq n$. We show that $n \geq i$ is indeed not sufficient:
+			\begin{align*}
+				&\WP{i = i + 2}(n \geq i)\\
+				\equiv\;&n \geq i + 2\\
+				&\\
+				&\WP{i >= n}(n \geq i + 2, i = n)\\
+				\equiv\;& (i < n \implies n \geq i + 2) \land (i \geq n \implies i = n)\\
+				\equiv\;& (i \geq n \lor n \geq i + 2) \land (i < n \lor i = n)\\
+				\equiv\;& i \neq n - 1 \land i \leq n \centernot \impliedby n \geq i\\
+			\end{align*}
+				
+			The weakest precondition tells us what we already knew, namely that $i$ must not be equal to $n - 1$ or, if we continue the loop $n - (2k + 1)$ for any $k$. A much stronger precondition, that contains information about the divisibility of $n$ and $i$ by $2$, is thus required here.
+		\end{enumerate}
+	\end{solution}
+	%@@@ END_SOLUTION
+\end{assignment}
+
+
+\clearpage
+\begin{assignment}[L]{Y?}
+Consider these control flow graph fragments (assume $x$ and $y$ to be $0$ initially):
+	\begin{tabularx}{\textwidth}{XX}
+		1.~~
+		
+		\begin{tikzpicture}[scale=0.7]
+\node[coordinate](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$i = 0$};
+\path[->](start) edge [] node [right]{} (assignment_0);
+\node[below=of assignment_0.south, circle, draw, yshift=6mm](loop_1_join){};
+\path[->](assignment_0) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_join.south, diamond, draw, yshift=6mm](loop_1_fork){i == n};
+\path[->](loop_1_join) edge [] node [right]{} (loop_1_fork);
+\draw let \p1=(loop_1_fork.west) in let \p2=(loop_1_fork.west) in node[coordinate](loop_1_fork_angle_l) at (\x1-10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$yes$} (loop_1_fork_angle_l);
+\draw let \p1=(loop_1_fork.east) in let \p2=(loop_1_fork.east) in node[coordinate](loop_1_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$no$} (loop_1_fork_angle_r);
+\node[below=of loop_1_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_2){$i = i+1$};
+\path[->](loop_1_fork_angle_r) edge [] node [right]{} (assignment_2);
+\node[below=of assignment_2.south, rectangle, draw, yshift=6mm](assignment_3){$y = 5 * i$};
+\path[->](assignment_2) edge [] node [right]{} (assignment_3);
+\node[below=of assignment_3.south, rectangle, draw, yshift=6mm](assignment_4){$x = x+y$};
+\path[->](assignment_3) edge [] node [right]{} (assignment_4);
+\draw let \p1=(assignment_4.south) in let \p2=(assignment_4.south) in node[coordinate](loop_1_back_edge_angle1) at (\x1+0mm, \y2+-4mm) {};
+\path[-](assignment_4) edge [] node [right]{} (loop_1_back_edge_angle1);
+\draw let \p1=(loop_1_back_edge_angle1) in let \p2=(loop_1_back_edge_angle1) in node[coordinate](loop_1_back_edge_angle2) at (\x1+20mm, \y2+0mm) {};
+\path[-](loop_1_back_edge_angle1) edge [] node [right]{} (loop_1_back_edge_angle2);
+\draw let \p1=(loop_1_back_edge_angle2) in let \p2=(loop_1_join) in node[coordinate](loop_1_back_edge_angle3) at (\x1+0mm, \y2+0mm) {};
+\path[-](loop_1_back_edge_angle2) edge [] node [right]{} (loop_1_back_edge_angle3);
+\path[->](loop_1_back_edge_angle3) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_fork_angle_l.south, coordinate, yshift=3mm](stop){Stop};
+\path[->](loop_1_fork_angle_l) edge [] node [left]{$x = {\displaystyle \sum_{k = 0}^{n} 5k}$} (stop);
+	\end{tikzpicture}&
+		2.~~
+
+		\begin{tikzpicture}[scale=0.7]
+\node[coordinate](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$i = 0$};
+\path[->](start) edge [] node [right]{} (assignment_0);
+\node[below=of assignment_0.south, circle, draw, yshift=6mm](loop_1_join){};
+\path[->](assignment_0) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_join.south, diamond, draw, yshift=6mm](loop_1_fork){i == n};
+\path[->](loop_1_join) edge [] node [right]{} (loop_1_fork);
+\draw let \p1=(loop_1_fork.west) in let \p2=(loop_1_fork.west) in node[coordinate](loop_1_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$yes$} (loop_1_fork_angle_l);
+\draw let \p1=(loop_1_fork.east) in let \p2=(loop_1_fork.east) in node[coordinate](loop_1_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_1_fork) edge [] node [above]{$no$} (loop_1_fork_angle_r);
+\node[below=of loop_1_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_2){$i = i+1$};
+\path[->](loop_1_fork_angle_r) edge [] node [right]{} (assignment_2);
+\node[below=of assignment_2.south, rectangle, draw, yshift=6mm](assignment_3){$y = y+5$};
+\path[->](assignment_2) edge [] node [right]{} (assignment_3);
+\node[below=of assignment_3.south, rectangle, draw, yshift=6mm](assignment_4){$x = x+y$};
+\path[->](assignment_3) edge [] node [right]{} (assignment_4);
+\draw let \p1=(assignment_4.south) in let \p2=(assignment_4.south) in node[coordinate](loop_1_back_edge_angle1) at (\x1+0mm, \y2+-4mm) {};
+\path[-](assignment_4) edge [] node [right]{} (loop_1_back_edge_angle1);
+\draw let \p1=(loop_1_back_edge_angle1) in let \p2=(loop_1_back_edge_angle1) in node[coordinate](loop_1_back_edge_angle2) at (\x1+20mm, \y2+0mm) {};
+\path[-](loop_1_back_edge_angle1) edge [] node [right]{} (loop_1_back_edge_angle2);
+\draw let \p1=(loop_1_back_edge_angle2) in let \p2=(loop_1_join) in node[coordinate](loop_1_back_edge_angle3) at (\x1+0mm, \y2+0mm) {};
+\path[-](loop_1_back_edge_angle2) edge [] node [right]{} (loop_1_back_edge_angle3);
+\path[->](loop_1_back_edge_angle3) edge [] node [right]{} (loop_1_join);
+\node[below=of loop_1_fork_angle_l.south, coordinate, yshift=3mm](stop){Stop};
+\path[->](loop_1_fork_angle_l) edge [] node [left]{$x = {\displaystyle \sum_{k = 0}^{n} 5k}$} (stop);
+	\end{tikzpicture}
+\end{tabularx} 
+
+\noindent Find suitable loop invariants and prove them locally consistent. Discuss, why these invariants have to be like that.
+
+\begin{solution}
+	\begin{enumerate}
+	\item
+		We show that $I \defequiv x = \sum_{k=0}^{i} 5k$ is sufficient:
+		\begin{align*}
+			&\;\WP{x = x + y}(I) &&\;\WP{y = 5 * i}(A)\\
+			\equiv&\;\WP{x = x + y}(x = \sum_{k=0}^{i} 5k) &\equiv&\;\WP{y = 5 * i}(x = -y + \sum_{k=0}^{i} 5k)\\
+			\equiv&\;x + y = \sum_{k=0}^{i} 5k &\equiv&\;x = -5i + \sum_{k=0}^{i} 5k\\
+			\equiv&\; x = -y + \sum_{k=0}^{i} 5k \;\;\; \equivdef A &\equiv&\;x = \sum_{k=0}^{i-1} 5k \;\;\; \equivdef B\\
+			&&&\\
+			&\;\WP{i = i + 1}(B) &	&\;\WP{i == n}(C, x = \sum_{k=0}^{n} 5k)\\
+			\equiv&\;\WP{i = i + 1}(x = \sum_{k=0}^{i-1} 5k) &	\equiv&\;\WP{i == n}(x = \sum_{k=0}^{i} 5k, x = \sum_{k=0}^{n} 5k)\\
+			\equiv&\;x = \sum_{k=0}^{i} 5k \;\;\; \equivdef C&	\equiv&\;(i \neq n  \land x = \sum_{k=0}^{i} 5k) \lor (i = n \land x = \sum_{k=0}^{n} 5k)\\
+			&&\equiv&\;(i \neq n  \land x = \sum_{k=0}^{i} 5k) \lor (i = n \land x = \sum_{k=0}^{i} 5k)\\
+			&&\equiv&\;x = \sum_{k=0}^{i} 5k \;\;\; \equiv I\\
+		\end{align*}
+
+	\item We show that $I \defequiv x = \sum_{k=0}^{i} 5k$ is \textbf{not} sufficient:
+		\begin{align*}
+			&\;\WP{x = x + y}(I) &&\;\WP{y = y + 5}(A)\\
+			\equiv&\;\WP{x = x + y}(x = \sum_{k=0}^{i} 5k) &\equiv&\;\WP{y = y + 5}(x = -y + \sum_{k=0}^{i} 5k)\\
+			\equiv&\;x + y = \sum_{k=0}^{i} 5k &\equiv&\;x = -(y + 5) + \sum_{k=0}^{i} 5k  \;\;\; \equivdef B\\
+			\equiv&\; x = -y + \sum_{k=0}^{i} 5k \;\;\; \equivdef A &&\\
+			&&&\\
+			&\;\WP{i = i + 1}(B) &&\;\WP{i == n}(C, x = \sum_{k=0}^{n} 5k)\\
+			\equiv&\;\WP{i = i + 1}(x = -(y + 5) + \sum_{k=0}^{i} 5k) &\equiv&\;\WP{i == n}(x = -(y + 5) + \sum_{k=0}^{i+1} 5k)\\
+			\equiv&\;x = -(y + 5) + \sum_{k=0}^{i+1} 5k \;\;\; \equivdef C &\equiv&\;(i \neq n \land x = -(y + 5) + \sum_{k = 0}^{i+1} 5k)\\
+			&&&\qquad \lor (i = n \land x = \sum_{k=0}^{n} 5k) \;\;\; \textcolor{red}{\centernot \impliedby A}\\
+		\end{align*}
+
+		This invariant is not strong enough, because we do not have any information about $y$, so we cannot simplify anything. Adding $y = 5i$ renders the invariant sufficient:
+
+		\begin{align*}
+			&\;\WP{x = x + y}(I)\\
+			\equiv&\;\WP{x = x + y}(x = \sum_{k=0}^{i} 5k \land y = 5i)\\
+			\equiv&\;x + y = \sum_{k=0}^{i} 5k \land y = 5i\\
+			\equiv&\;x = -5i + \sum_{k=0}^{i} 5k \land y = 5i\\
+			\equiv&\;x = \sum_{k=0}^{i-1} 5k \land y = 5i \;\;\; \equivdef A\\
+			&\\
+			&\;\WP{y = y + 5}(A)\\
+			\equiv&\;\WP{y = y + 5}(x = \sum_{k=0}^{i-1} 5k \land y = 5i)\\
+			\equiv&\;x = \sum_{k=0}^{i-1} 5k \land y + 5 = 5i\\
+			\equiv&\;x = \sum_{k=0}^{i-1} 5k \land y = 5(i-1) \;\;\; \equivdef B\\
+			&\\
+			&\;\WP{i = i + 1}(B)\\
+			\equiv&\;\WP{i = i + 1}(x = \sum_{k=0}^{i-1} 5k \land y = 5(i-1))\\
+			\equiv&\;x = \sum_{k=0}^{i} 5k \land y = 5i \;\;\; \equivdef C\\
+			&\\
+			&\;\WP{i == n}(C, x = \sum_{k=0}^{n} 5k)\\
+			\equiv&\;\WP{i == n}(x = \sum_{k=0}^{i} 5k \land y = 5i, x = \sum_{k=0}^{n} 5k)\\
+			\equiv&\;(i \neq n \land x = \sum_{k=0}^{i} 5k \land y = 5i) \lor (i = n \land x = \sum_{k=0}^{n} 5k)\\
+			\impliedby&\;(i \neq n \land x = \sum_{k=0}^{i} 5k \land y = 5i) \lor (i = n \land x = \sum_{k=0}^{i} 5k \land y = 5i)\\
+			\equiv&\;x = \sum_{k=0}^{i} 5k \land y = 5i \;\;\; \equiv I\\
+		\end{align*}
+	\end{enumerate}
+
+	In general, two questions arise:
+	\begin{itemize}
+		\item Why is information about $y$ required at all? The simple answer is, because $y$ is used to compute $x$ and $x$ is the variable we want to prove something about.
+		\item Why is information about $y$ required in the second invariant, but not in the first? In the first cfg, the value of $y$ is computed inside the loop independently of any value other than $i$, so it is not necessary to know anything about the previous value of $y$. This becomes much clearer when looking at the weakest preconditions. The third statement in the loop introduces the variable $y$ into the assertion, but this $y$ is removed (replaced by $5i$) by the next statement, such that the WP is again $y$-independant. In other words: Since the value of $y$ is irrelevant when entering a loop iteration, we do not need it in the invariant. In the second case, however, $y$ is computed from the previous value of $y$, so the value of $y$ when entering a loop iteration is indeed important, so we have to make a statement about it inside the invariant. This is often referred to as \emph{loop-carried dependency}.
+	\end{itemize}
+\end{solution}
+\end{assignment}
+
+
+\clearpage
+\begin{assignment}[L]{Two b, or not two b}
+	Prove $Z$ using weakest preconditions.
+	\begin{center}
+		\begin{tikzpicture}
+		\input{cfg1.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+	\begin{solution}
+		An intuitive loop invariant is $I \defequiv x = 5i + 2b \land b \in \{ 0, 1 \}$.
+
+		\begin{align*}
+			&\;\WP{b = 1 - b}(I)\\
+			\equiv&\;\WP{b = 1 - b}(x = 5i + 2b \land b \in \{ 0, 1 \})\\
+			\equiv&\;x = 5i + 2(1-b) \land (1 - b) \in \{ 0, 1 \}\\
+			\equiv&\;x = 5i -2b + 2 \land b \in \{ 0, 1 \} \;\;\; \equivdef A\\
+			&&\\
+			&\;\WP{i = i + 1}(A)\\
+			\equiv&\;\WP{i = i + 1}(x = 5i -2b + 2 \land b \in \{ 0, 1 \})\\
+			\equiv&\;x = 5(i+1) - 2b + 2 \land b \in \{ 0, 1 \}\\
+			\equiv&;x = 5i - 2b + 7 \land b \in \{ 0, 1 \} \;\;\; \equivdef B\\
+			&&\\
+			&\;\WP{x = x + 3}(B)\\
+			\equiv&\;\WP{x = x + 3}(x = 5i - 2b + 7 \land b \in \{ 0, 1 \})\\
+			\equiv&\;x + 3 = 5i - 2b + 7 \land b \in \{ 0, 1 \}\\
+			\equiv&\;x = 5i - 2b + 4 \land b \in \{ 0, 1 \} \;\;\; \equivdef C\\
+			&&\\
+			&\;\WP{x = x + 2}(A)\\
+			\equiv&\;\WP{x = x + 2}(x = 5i - 2b + 2 \land b \in \{ 0, 1 \})\\
+			\equiv&\;x + 2 = 5i - 2b + 2 \land b \in \{ 0, 1 \}\\
+			\equiv&\;x = 5i - 2b \land b \in \{ 0, 1 \} \;\;\; \equivdef D\\
+			&&\\
+			&\;\WP{b == 0}(C, D)\\
+			\equiv&\;\WP{b == 0}(x = 5i - 2b + 4 \land b \in \{ 0, 1\}, x = 5i - 2b \land b \in \{ 0, 1 \})\\
+			\equiv&\;(b \neq 0 \land x = 5i - 2b + 4 \land b \in \{ 0, 1 \}) \lor (b = 0 \land x = 5i - 2b \land b \in \{ 0, 1 \})\\
+			\equiv&\;(b = 1 \land x = 5i + 2) \lor (b = 0 \land x = 5i)\\
+			\equiv&\;(b = 1 \land x = 5i + 2b) \lor (b = 0 \land x = 5i + 2b)\\
+			\equiv&\;x = 5i + 2b \land b \in \{ 0, 1 \} \;\;\; \equivdef E\\
+			&&\\
+			&\;\WP{i == n}(E, Z)\\
+			\equiv&\;\WP{i == n}(x = 5i + 2b \land b \in \{ 0, 1 \}, x = 5n)\\
+			\equiv&\;(i \neq n \land x = 5i + 2b \land b \in \{ 0, 1 \}) \lor (i = n \land x = 5n)\\
+			\equiv&\;(i \neq n \land x = 5i + 2b \land b \in \{ 0, 1\}) \lor (i = n \land x = 5n + 2b \land b = 0)\\
+			\equiv&\;x = 5i + 2b \land ((i \neq n \land b \in \{ 0, 1 \}) \lor (i = n \land b = 0)) \;\;\; \textcolor{red}{\centernot \impliedby I}\\
+		\end{align*}
+
+		The proof of local consistency fails, because the invariant does not imply that $b = 0$ when leaving the loop ($i = n$), so we have to add this to the invariant:
+		\begin{align*}
+			I \defequiv x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0)
+		\end{align*}
+
+		\begin{align*}
+			&\;\WP{b = 1 - b}(I)\\
+			\equiv&\;\WP{b = 1 - b}(x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0))\\
+			\equiv&\;x = 5i -2b + 2 \land b \in \{ 0, 1 \} \land (i = n \implies b = 1) \;\;\; \equivdef A\\
+			&&\\
+			&\;\WP{i = i + 1}(A)\\
+			\equiv&\;\WP{i = i + 1}(x = 5i - 2b + 2 \land b \in \{ 0, 1 \} \land (i = n \implies b = 1))\\
+			\equiv&\;x = 5i -2b + 7 \land b \in \{ 0, 1 \} \land (i + 1 = n \implies b = 1) \;\;\; \equivdef B\\
+			&&\\
+			&\;\WP{x = x + 3}(B)\\
+			\equiv&\;\WP{x = x + 3}(x = 5i - 2b + 7 \land b \in \{ 0, 1 \} \land (i + 1 = n \implies b = 1))\\
+			\equiv&\;x = 5i - 2b + 4 \land b \in \{ 0, 1 \} \land (i + 1 = n \implies b = 1) \;\;\; \equivdef C\\
+			&&\\
+			&\;\WP{x = x + 2}(A)\\
+			\equiv&\;\WP{x = x + 2}(x = 5i - 2b + 2 \land b \in \{ 0, 1 \} \land (i = n \implies b = 1))\\
+			\equiv&\;x = 5i - 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 1)\;\;\; \equivdef D\\
+			&&\\
+			&\;\WP{b == 0}(C, D)\\
+			\equiv&\;\WP{b == 0}(x = 5i - 2b + 4 \land b \in \{ 0, 1 \} \land (i + 1 = n \implies b = 1), \\
+			&\;\qquad x = 5i - 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 1))\\
+			\equiv&\;(b = 1 \land x = 5i - 2b + 4 \land (i + 1 = n \implies b = 1))\\
+			&\;\qquad \lor (b = 0 \land x = 5i - 2b \land (i = n \implies b = 1))\\
+			\equiv&\;(b = 1 \land x = 5i + 2) \lor (b = 0 \land x = 5i \land i \neq n)\\
+			\impliedby&\;(b = 1 \land x = 5i +2b \land i \neq n) \lor (b = 0 \land x = 5i + 2b \land i \neq n)\\
+			\equiv&\;x = 5i + 2b \land i \neq n \land b \in \{ 0, 1 \} \;\;\; \equivdef E\\
+			&&\\
+			&\;\WP{i == n}(E, Z)\\
+			\equiv&\;\WP{i == n}(x = 5i + 2b \land i \neq n \land b \in \{ 0, 1 \}, x = 5n)\\
+			\equiv&\;(i \neq n \land x = 5i + 2b \land b \in \{ 0, 1 \}) \lor (i = n \land x = 5n)\\
+			\impliedby&\;(i \neq n \land x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0))\\
+			&\;\qquad \lor (i = n \land x = 5n \land (i = n \implies b = 0) \land b \in \{ 0, 1 \})\\
+			\equiv&\;(i \neq n \land x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0))\\
+			&\;\qquad \lor (i = n \land x = 5i + 2b \land (i = n \implies b = 0) \land b \in \{ 0, 1 \})\\
+			\equiv&\;x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0) \;\;\; \equiv I\\
+			&&\\
+		\end{align*}
+		\begin{align*}
+			&\;\WP{b = 0}(I)\\
+			\equiv&\;\WP{b = 0}(x = 5i + 2b \land b \in \{ 0, 1 \} \land (i = n \implies b = 0))\\
+			\equiv&\;x = 5i \;\;\; \equivdef F\\
+			&&\\
+			&\;\WP{i = 0}(F)\\
+			\equiv&\;\WP{i = 0}(x = 5i)\\
+			\equiv&\;x = 0 \;\;\; \equivdef G\\
+			&&\\
+			&\;\WP{n = read()}(G)\\
+			\equiv&\;\WP{n = read()}(x = 0)\\
+			\equiv&\;x = 0 \;\;\; H\\
+			&&\\
+			&\;\WP{x = 0}(H)\\
+			\equiv&\;\WP{x = 0}(x = 0)\\
+			\equiv&\;true\\
+		\end{align*}
+		\hfill \qed
+
+
+	\end{solution}
+\end{assignment}
+
+\clearpage
+\begin{assignment}[L]{Squared}
+	Given is the following control flow graph:
+	\begin{center}
+		\begin{tikzpicture}\node[circle,draw](start){Start};
+		\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$x = 0$};
+		\path[->](start) edge [] node [right]{} (assignment_0);
+		\node[below=of assignment_0.south, rectangle, draw, yshift=3mm](assignment_1){$i = 0$};
+		\path[->](assignment_0) edge [] node [right]{} (assignment_1);
+		\node[below=of assignment_1.south, rectangle, draw, yshift=3mm](read_2){$n = read()$};
+		\path[->](assignment_1) edge [] node [right]{} (read_2);
+		\node[below=of read_2.south, diamond, draw, yshift=3mm](branch_3_fork){n < 0};
+		\path[->](read_2) edge [] node [right]{} (branch_3_fork);
+		\draw let \p1=(branch_3_fork.west) in let \p2=(branch_3_fork.west) in node[coordinate](branch_3_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+		\path[-](branch_3_fork) edge [] node [above]{$no$} (branch_3_fork_angle_l);
+		\draw let \p1=(branch_3_fork.east) in let \p2=(branch_3_fork.east) in node[coordinate](branch_3_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+		\path[-](branch_3_fork) edge [] node [above]{$yes$} (branch_3_fork_angle_r);
+		\node[below=of branch_3_fork_angle_l.south, rectangle, draw, yshift=3mm](assignment_4){$m = n$};
+		\path[->](branch_3_fork_angle_l) edge [] node [right]{} (assignment_4);
+		\node[below=of branch_3_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_5){$m = -n$};
+		\path[->](branch_3_fork_angle_r) edge [] node [right]{} (assignment_5);
+		\node[below=of assignment_4.south, coordinate, yshift=3mm](branch_3_join_anchor_l){};
+		\node[below=of assignment_5.south, coordinate, yshift=3mm](branch_3_join_anchor_r){};
+		\draw let \p1=(branch_3_join_anchor_l) in let \p2=(branch_3_join_anchor_r) in let \p3=(branch_3_fork) in node[circle,draw](branch_3_join) at (\x3,{min(\y1,\y2)}) {};\draw let \p1=(branch_3_join_anchor_l) in let \p2=(branch_3_join) in node[coordinate](branch_3_join_angle_l) at (\x1+0mm, \y2+0mm) {};
+		\path[-](assignment_4) edge [] node [right]{} (branch_3_join_angle_l);
+		\path[->](branch_3_join_angle_l) edge [] node [right]{} (branch_3_join);
+		\draw let \p1=(branch_3_join_anchor_r) in let \p2=(branch_3_join) in node[coordinate](branch_3_join_angle_r) at (\x1+0mm, \y2+0mm) {};
+		\path[-](assignment_5) edge [] node [right]{} (branch_3_join_angle_r);
+		\path[->](branch_3_join_angle_r) edge [] node [right]{} (branch_3_join);
+		\node[below=of branch_3_join.south, circle, draw, yshift=3mm](loop_6_join){};
+		\path[->](branch_3_join) edge [] node [right]{} (loop_6_join);
+		\node[below=of loop_6_join.south, diamond, draw, yshift=3mm](loop_6_fork){i == m};
+		\path[->](loop_6_join) edge [] node [right]{} (loop_6_fork);
+		\draw let \p1=(loop_6_fork.west) in let \p2=(loop_6_fork.west) in node[coordinate](loop_6_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+		\path[-](loop_6_fork) edge [] node [above]{$yes$} (loop_6_fork_angle_l);
+		\draw let \p1=(loop_6_fork.east) in let \p2=(loop_6_fork.east) in node[coordinate](loop_6_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+		\path[-](loop_6_fork) edge [] node [above]{$no$} (loop_6_fork_angle_r);
+		\node[below=of loop_6_fork_angle_l.south, rectangle, draw, yshift=3mm](write_7){$write(x)$};
+		\path[->](loop_6_fork_angle_l) edge [] node [left]{} (write_7);
+		\node[below=of loop_6_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_8){$x = x+i$};
+		\path[->](loop_6_fork_angle_r) edge [] node [right]{} (assignment_8);
+		\node[below=of assignment_8.south, rectangle, draw, yshift=3mm](assignment_9){$i = i+1$};
+		\path[->](assignment_8) edge [] node [right]{} (assignment_9);
+		\node[below=of assignment_9.south, rectangle, draw, yshift=3mm](assignment_10){$x = x+i$};
+		\path[->](assignment_9) edge [] node [right]{} (assignment_10);
+		\draw let \p1=(assignment_10.south) in let \p2=(assignment_10.south) in node[coordinate](loop_6_back_edge_angle1) at (\x1+0mm, \y2+-10mm) {};
+		\path[-](assignment_10) edge [] node [right]{} (loop_6_back_edge_angle1);
+		\draw let \p1=(loop_6_back_edge_angle1) in let \p2=(loop_6_back_edge_angle1) in node[coordinate](loop_6_back_edge_angle2) at (\x1+20mm, \y2+0mm) {};
+		\path[-](loop_6_back_edge_angle1) edge [] node [right]{} (loop_6_back_edge_angle2);
+		\draw let \p1=(loop_6_back_edge_angle2) in let \p2=(loop_6_join) in node[coordinate](loop_6_back_edge_angle3) at (\x1+0mm, \y2+0mm) {};
+		\path[-](loop_6_back_edge_angle2) edge [] node [right]{} (loop_6_back_edge_angle3);
+		\path[->](loop_6_back_edge_angle3) edge [] node [right]{} (loop_6_join);
+		\node[below=of write_7.south, circle, draw,yshift=3mm](stop){Stop};
+		\path[->](write_7) edge [] node [left]{$Z \defequiv x = n^{2}$} (stop);
+		\end{tikzpicture}
+	\end{center}
+	Prove that $Z$ holds.
+	
+	\begin{solution}
+		First of all, we find a suitable loop invariant:
+		\begin{itemize}
+			\item At the point before the loop it holds for every iteration that $x = i^2$.
+			\item Now we have a relation between $x$ and $i$, as well as $i$ and $m$ (due to the loop's condition), but to prove $Z$, we need an additional relation (of one of them) with $n$. We know that $m = |n|$.
+		\end{itemize}
+		We combine these into the loop invariant $I \defequiv x = i^2 \land m = |n|$. Then, we compute weakest preconditions:
+		
+		\begin{tabularx}{\textwidth}{Xp{5mm}X}
+		$\begin{aligned}
+			&\WP{x = x + i}(I)\\
+			\equiv\;&\WP{x = x + i}(x = i^2 \land m = |n|)\\
+			\equiv\;& x + i = i^2 \land m = |n|\\
+			\equiv\;& x = i^2 - i \land m = |n| \;\;\; \equivdef A\\
+		\end{aligned}$
+		& &
+		$\begin{aligned}
+			&\WP{i = i + 1}(A)\\
+			\equiv\;&\WP{i = i + 1}(x = i^2 - i \land m = |n|)\\
+			\equiv\;& x = (i+1)^2 - i - 1 \land m = |n|\\
+			\equiv\;& x = i^2 +i \land m = |n| \;\;\; \equivdef B\\
+		\end{aligned}$
+		\\
+		& &\\	
+		\adjustbox{valign=t}{$\begin{aligned}
+			&\WP{x = x + i}(B)\\
+			\equiv\;&\WP{x = x + i}(x = i^2 + i \land m = |n|)\\
+			\equiv\;& x + i = i^2 + i \land m = |n|\\
+			\equiv\;& x = i^2 \land m = |n| \;\;\; \equiv I \;\;\; \equivdef C\\
+		\end{aligned}$}
+		& &		
+		\adjustbox{valign=t}{$\begin{aligned}
+			&\WP{write(x)}(Z)\\
+			\equiv\;&\WP{write(x)}(x = n^2)\\
+			\equiv\;&x = n ^2 \;\;\; \equiv Z \;\;\; \equivdef D\\
+		\end{aligned}$}\\
+		& &\\
+		\multicolumn{3}{X}{		
+		\hspace*{-6mm}$\begin{aligned}
+			&\WP{i == m}(C, D)\\
+			\equiv\;&\WP{i == m}(x = i^2 \land m = |n|, x = n^2)\\
+			\equiv\;&(i \neq m \land x = i^2 \land m = |n|) \lor (i = m \land x = n^2)\\
+			\impliedby\;&(i \neq m \land x = i^2 \land m = |n|) \lor (i = m \land x = n^2 \land m = |n|)\\
+			\equiv\;&(i \neq m \land x = i^2 \land m = |n|) \lor (i = m \land x = i^2 \land m = |n|)\\
+			\equiv\;&x = i^2 \land m = |n| \land (i \neq m \lor i = m)\\
+			\equiv\;&x = i^2 \land m = |n|\;\;\; \equiv I\\
+		\end{aligned}$}\\
+		& &\\
+		$\begin{aligned}
+			&\WP{m = n}(I)\\
+			\equiv\;&\WP{m = n}(x = i^2 \land m = |n|)\\
+			\equiv\;&x = i^2 \land n = |n|\;\;\; \equivdef E\\
+		\end{aligned}$
+		& &		
+		$\begin{aligned}
+			&\WP{m = -n}(I)\\
+			\equiv\;&\WP{m = -n}(x = i^2 \land m = |n|)\\
+			\equiv\;& x = i^2 \land -n = |n|\;\;\; \equivdef F\\
+		\end{aligned}$\\
+		& &\\
+		\multicolumn{3}{X}{
+		$\begin{aligned}
+			&\WP{n < 0}(E, F)\\
+			\equiv\;&\WP{n < 0}(x = i^2 \land n = |n|, x = i^2 \land -n = |n|)\\
+			\equiv\;&(n \geq 0 \implies x = i^2 \land n = |n|) \land (n < 0 \implies x = i^2 \land -n = |n|)\\
+			\equiv\;&(n \geq 0 \implies x = i^2) \land (n < 0 \implies x = i^2)\\
+			\equiv\;&x = i^2 \lor (n < 0 \land n \geq 0)\\
+			\equiv\;&x = i^2 \;\;\; \equivdef G\\
+		\end{aligned}$}\\
+		& &\\
+		\adjustbox{valign=t}{$\begin{aligned}
+			&\WP{n = read()}(G) \equiv G \;\;\; \equivdef H\\
+		\end{aligned}$}\\
+		& &
+		\adjustbox{valign=t}{$\begin{aligned}
+			&\WP{i = 0}(H)\\
+			\equiv\;&\WP{i = 0}(x = i^2)\\
+			\equiv\;&x = 0 \;\;\; \equivdef J\\
+		\end{aligned}$}\\
+		& &\\
+		$\begin{aligned}
+			&\WP{x = 0}(J)\\
+			\equiv\;&\WP{x = 0}(x = 0)\\
+			\equiv\;&0 = 0\\
+			\equiv\;&true \;\;\; \equivdef K\\
+		\end{aligned}$
+		& &\\
+		\end{tabularx}
+		
+		\noindent We did prove all assertions locally consistent and for $true$ at the start node, thus $Z$ holds for all runs of the program.
+		
+		\clearpage
+		\noindent This is the annotated control flow graph:
+		\begin{center}
+			\begin{tikzpicture}\node[circle,draw](start){Start};
+			\node[below=of start.south, rectangle, draw, yshift=3mm](assignment_0){$x = 0$};
+			\path[->](start) edge [] node [right]{$K \defequiv true$} (assignment_0);
+			\node[below=of assignment_0.south, rectangle, draw, yshift=3mm](assignment_1){$i = 0$};
+			\path[->](assignment_0) edge [] node [right]{$J \defequiv x = 0$} (assignment_1);
+			\node[below=of assignment_1.south, rectangle, draw, yshift=3mm](read_2){$n = read()$};
+			\path[->](assignment_1) edge [] node [right]{$H \defequiv x = i^2$} (read_2);
+			\node[below=of read_2.south, diamond, draw, yshift=3mm](branch_3_fork){n < 0};
+			\path[->](read_2) edge [] node [right]{$G \defequiv x = i^2$} (branch_3_fork);
+			\draw let \p1=(branch_3_fork.west) in let \p2=(branch_3_fork.west) in node[coordinate](branch_3_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+			\path[-](branch_3_fork) edge [] node [above]{$no$} (branch_3_fork_angle_l);
+			\draw let \p1=(branch_3_fork.east) in let \p2=(branch_3_fork.east) in node[coordinate](branch_3_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+			\path[-](branch_3_fork) edge [] node [above]{$yes$} (branch_3_fork_angle_r);
+			\node[below=of branch_3_fork_angle_l.south, rectangle, draw, yshift=3mm](assignment_4){$m = n$};
+			\path[->](branch_3_fork_angle_l) edge [] node [left]{$E \defequiv x = i^2 \land n = |n|$} (assignment_4);
+			\node[below=of branch_3_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_5){$m = -n$};
+			\path[->](branch_3_fork_angle_r) edge [] node [right]{$F \defequiv x = i^2 \land -n = |n|$} (assignment_5);
+			\node[below=of assignment_4.south, coordinate, yshift=3mm](branch_3_join_anchor_l){};
+			\node[below=of assignment_5.south, coordinate, yshift=3mm](branch_3_join_anchor_r){};
+			\draw let \p1=(branch_3_join_anchor_l) in let \p2=(branch_3_join_anchor_r) in let \p3=(branch_3_fork) in node[circle,draw](branch_3_join) at (\x3,{min(\y1,\y2)}) {};\draw let \p1=(branch_3_join_anchor_l) in let \p2=(branch_3_join) in node[coordinate](branch_3_join_angle_l) at (\x1+0mm, \y2+0mm) {};
+			\path[-](assignment_4) edge [] node [right]{} (branch_3_join_angle_l);
+			\path[->](branch_3_join_angle_l) edge [] node [right]{} (branch_3_join);
+			\draw let \p1=(branch_3_join_anchor_r) in let \p2=(branch_3_join) in node[coordinate](branch_3_join_angle_r) at (\x1+0mm, \y2+0mm) {};
+			\path[-](assignment_5) edge [] node [right]{} (branch_3_join_angle_r);
+			\path[->](branch_3_join_angle_r) edge [] node [right]{} (branch_3_join);
+			\node[below=of branch_3_join.south, circle, draw, yshift=3mm](loop_6_join){};
+			\path[->](branch_3_join) edge [] node [left,xshift=-2mm,yshift=-6mm]{$I \defequiv x = i^2 \land m = |n|$} (loop_6_join);
+			\node[below=of loop_6_join.south, diamond, draw, yshift=3mm](loop_6_fork){i == m};
+			\path[->](loop_6_join) edge [] node [right]{} (loop_6_fork);
+			\draw let \p1=(loop_6_fork.west) in let \p2=(loop_6_fork.west) in node[coordinate](loop_6_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+			\path[-](loop_6_fork) edge [] node [above]{$yes$} (loop_6_fork_angle_l);
+			\draw let \p1=(loop_6_fork.east) in let \p2=(loop_6_fork.east) in node[coordinate](loop_6_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+			\path[-](loop_6_fork) edge [] node [above]{$no$} (loop_6_fork_angle_r);
+			\node[below=of loop_6_fork_angle_l.south, rectangle, draw, yshift=3mm](write_7){$write(x)$};
+			\path[->](loop_6_fork_angle_l) edge [] node [left]{$D \defequiv x = n^2$} (write_7);
+			\node[below=of loop_6_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_8){$x = x+i$};
+			\path[->](loop_6_fork_angle_r) edge [] node [right]{$C \defequiv x = i^2 \land m = |n|$} (assignment_8);
+			\node[below=of assignment_8.south, rectangle, draw, yshift=3mm](assignment_9){$i = i+1$};
+			\path[->](assignment_8) edge [] node [right]{$B \defequiv x = i^2 + i \land m = |n|$} (assignment_9);
+			\node[below=of assignment_9.south, rectangle, draw, yshift=3mm](assignment_10){$x = x+i$};
+			\path[->](assignment_9) edge [] node [right]{$A \defequiv x = i^2 - i \land m = |n|$} (assignment_10);
+			\draw let \p1=(assignment_10.south) in let \p2=(assignment_10.south) in node[coordinate](loop_6_back_edge_angle1) at (\x1+0mm, \y2+-10mm) {};
+			\path[-](assignment_10) edge [] node [right]{} (loop_6_back_edge_angle1);
+			\draw let \p1=(loop_6_back_edge_angle1) in let \p2=(loop_6_back_edge_angle1) in node[coordinate](loop_6_back_edge_angle2) at (\x1+20mm, \y2+0mm) {};
+			\path[-](loop_6_back_edge_angle1) edge [] node [right]{} (loop_6_back_edge_angle2);
+			\draw let \p1=(loop_6_back_edge_angle2) in let \p2=(loop_6_join) in node[coordinate](loop_6_back_edge_angle3) at (\x1+0mm, \y2+0mm) {};
+			\path[-](loop_6_back_edge_angle2) edge [] node [right]{} (loop_6_back_edge_angle3);
+			\path[->](loop_6_back_edge_angle3) edge [] node [right]{} (loop_6_join);
+			\node[below=of write_7.south, circle, draw,yshift=3mm](stop){Stop};
+			\path[->](write_7) edge [] node [left]{$Z \defequiv x = n^{2}$} (stop);
+			\end{tikzpicture}
+		\end{center}
+		
+	\end{solution}
+\end{assignment}
+
+
+\clearpage
+\begin{assignment}[H, points=6]{Ready, Z, go!}
+	Find a formula $Z$ to express the exact value $x$ the program computes. Then prove this $Z$ using weakest preconditions.
+  \begin{center}
+  \begin{tikzpicture}\node[circle,draw](start){Start};
+\node[below=of start.south, rectangle, draw, yshift=3mm](read_0){$n = read()$};
+\path[->](start) edge [] node [right]{$\mbox{}$} (read_0);
+\node[below=of read_0.south, rectangle, draw, yshift=3mm](assignment_1){$i = 0$};
+\path[->](read_0) edge [] node [right]{$\mbox{}$} (assignment_1);
+\node[below=of assignment_1.south, rectangle, draw, yshift=3mm](assignment_2){$x = 1$};
+\path[->](assignment_1) edge [] node [right]{$\mbox{}$} (assignment_2);
+\node[below=of assignment_2.south, rectangle, draw, yshift=3mm](assignment_3){$y = 0$};
+\path[->](assignment_2) edge [] node [right]{$\mbox{}$} (assignment_3);
+\node[below=of assignment_3.south, circle, draw, yshift=3mm](loop_4_join){};
+\path[->](assignment_3) edge [] node [right]{$\mbox{}$} (loop_4_join);
+\node[below=of loop_4_join.south, diamond, draw, yshift=3mm](loop_4_fork){i == n};
+\path[->](loop_4_join) edge [] node [right]{$\mbox{}$} (loop_4_fork);
+\draw let \p1=(loop_4_fork.west) in let \p2=(loop_4_fork.west) in node[coordinate](loop_4_fork_angle_l) at (\x1+-10mm, \y2+0mm) {};
+\path[-](loop_4_fork) edge [] node [above]{$yes$} (loop_4_fork_angle_l);
+\draw let \p1=(loop_4_fork.east) in let \p2=(loop_4_fork.east) in node[coordinate](loop_4_fork_angle_r) at (\x1+10mm, \y2+0mm) {};
+\path[-](loop_4_fork) edge [] node [above]{$no$} (loop_4_fork_angle_r);
+\node[below=of loop_4_fork_angle_l.south, rectangle, draw, yshift=3mm](write_5){$write(x)$};
+\path[->](loop_4_fork_angle_l) edge [] node [left]{$\mbox{}$} (write_5);
+\node[below=of loop_4_fork_angle_r.south, rectangle, draw, yshift=3mm](assignment_6){$y = y+3$};
+\path[->](loop_4_fork_angle_r) edge [] node [right]{$\mbox{}$} (assignment_6);
+\node[below=of assignment_6.south, rectangle, draw, yshift=3mm](assignment_7){$x = y*x$};
+\path[->](assignment_6) edge [] node [right]{$\mbox{}$} (assignment_7);
+\node[below=of assignment_7.south, rectangle, draw, yshift=3mm](assignment_8){$i = i+1$};
+\path[->](assignment_7) edge [] node [right]{$\mbox{}$} (assignment_8);
+\draw let \p1=(assignment_8.south) in let \p2=(assignment_8.south) in node[coordinate](loop_4_back_edge_angle1) at (\x1+0mm, \y2+-10mm) {};
+\path[-](assignment_8) edge [] node [right]{$\mbox{}$} (loop_4_back_edge_angle1);
+\draw let \p1=(loop_4_back_edge_angle1) in let \p2=(loop_4_back_edge_angle1) in node[coordinate](loop_4_back_edge_angle2) at (\x1+20mm, \y2+0mm) {};
+\path[-](loop_4_back_edge_angle1) edge [] node [right]{} (loop_4_back_edge_angle2);
+\draw let \p1=(loop_4_back_edge_angle2) in let \p2=(loop_4_join) in node[coordinate](loop_4_back_edge_angle3) at (\x1+0mm, \y2+0mm) {};
+\path[-](loop_4_back_edge_angle2) edge [] node [right]{} (loop_4_back_edge_angle3);
+\path[->](loop_4_back_edge_angle3) edge [] node [right]{} (loop_4_join);
+\node[below=of write_5.south, circle, draw,yshift=3mm](stop){Stop};
+\path[->](write_5) edge [] node [left]{$\mbox{Z}$} (stop);
+  \end{tikzpicture}
+  \end{center}
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H,points=8]{Loloopop}
+	Prove $Z$ using weakest preconditions:
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg2.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+	\noindent \hint{If you have to find invariants for nested loops, it is usually easiest to work from outermost loop to innermost loop.}
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H, points=3]{Somethng s wrong wth ths program...}
+	Prove $Z$ using weakest preconditions.
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg3.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+\end{assignment}
+
+\begin{assignment}[H,points=3]{A Neverending Story}
+Prove that the following program cannot terminate using weakest preconditions.
+\begin{center}
+\begin{tikzpicture}
+	\node[draw,circle](start) {Start};
+	\node[draw,rectangle,below=of start](read) {$n = read()$};
+	\node[draw,diamond,below=of read](branch) {$n > 0$};
+	\node[coordinate,left=of branch,xshift=-3mm](branch_angle_l) {};
+	\node[draw,circle,below=of branch_angle_l](join_l) {};
+	\node[draw,diamond,below=of join_l](cond_l) {$n <= 0$};
+	\node[coordinate,left=of cond_l](cond_l_angle) {};
+	\node[draw,rectangle,below=of cond_l_angle](assign_l) {$n = n - 1$};
+	\node[coordinate,below=of assign_l,yshift=3mm](back_l_angle_0) {};
+	\node[coordinate,left=of back_l_angle_0,xshift=-5mm](back_l_angle_1) {};
+	\draw let \p1=(back_l_angle_1) in let \p2=(join_l) in node[coordinate](back_l_angle_2) at (\x1,\y2) {};
+
+	\path[->](start) edge [] node [] {} (read);
+	\path[->](read) edge [] node [] {} (branch);
+
+	\path[-](branch) edge [] node[above]{no} (branch_angle_l);
+	\path[->](branch_angle_l) edge [] node[] {} (join_l);
+	\path[->](join_l) edge [] node[] {} (cond_l);
+	\path[-](cond_l) edge [] node[above] {yes} (cond_l_angle);
+	\path[->](cond_l_angle) edge [] node[] {} (assign_l);
+	\path[-](assign_l) edge [] node[] {} (back_l_angle_0);
+	\path[-](back_l_angle_0) edge [] node[] {} (back_l_angle_1);
+	\path[-](back_l_angle_1) edge [] node[] {} (back_l_angle_2);
+	\path[->](back_l_angle_2) edge [] node[] {} (join_l);
+
+	\node[coordinate,right=of branch,xshift=3mm](branch_angle_r) {};
+	\node[draw,circle,below=of branch_angle_r](join_r) {};
+	\node[draw,diamond,below=of join_r](cond_r) {$n <= 0$};
+	\node[coordinate,right=of cond_r](cond_r_angle) {};
+	\node[draw,rectangle,below=of cond_r_angle](assign_r) {$n = n + 1$};
+	\node[coordinate,below=of assign_r,yshift=3mm](back_r_angle_0) {};
+	\node[coordinate,right=of back_r_angle_0,xshift=5mm](back_r_angle_1) {};
+	\draw let \p1=(back_r_angle_1) in let \p2=(join_r) in node[coordinate](back_r_angle_2) at (\x1,\y2) {};
+
+	\path[-](branch) edge [] node[above]{yes} (branch_angle_r);
+	\path[->](branch_angle_r) edge [] node[] {} (join_r);
+	\path[->](join_r) edge [] node[] {} (cond_r);
+	\path[-](cond_r) edge [] node[above] {no} (cond_r_angle);
+	\path[->](cond_r_angle) edge [] node[] {} (assign_r);
+	\path[-](assign_r) edge [] node[] {} (back_r_angle_0);
+	\path[-](back_r_angle_0) edge [] node[] {} (back_r_angle_1);
+	\path[-](back_r_angle_1) edge [] node[] {} (back_r_angle_2);
+	\path[->](back_r_angle_2) edge [] node[] {} (join_r);
+
+	\draw let \p1=(branch) in let \p2=(cond_r) in node[draw,circle](join) at (\x1,\y2) {};
+	\node[draw,circle,below=of join](stop) {Stop};
+
+	\path[->](cond_l) edge [] node[above] {no} (join);
+	\path[->](cond_r) edge [] node[above] {yes} (join);
+	\path[->](join) edge [] node[] {} (stop);
+
+\end{tikzpicture}
+\end{center}
+
+\end{assignment}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
