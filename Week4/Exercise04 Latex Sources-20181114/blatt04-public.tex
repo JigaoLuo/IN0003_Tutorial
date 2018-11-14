@@ -1,0 +1,187 @@
+\documentclass[
+  %solution,
+  english
+	%german
+]{tumteaching}
+
+\usepackage{listings}
+\usepackage{paralist}
+
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{braket}
+\usepackage[inline]{enumitem}
+\usepackage{amsmath,amsthm}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{centernot}
+\usepackage{multicol}
+\usepackage{adjustbox}
+\usepackage{ltablex}
+\usepackage{comment}
+
+\usepackage{info2}
+
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{shapes.callouts}
+
+\tikzset{snake it/.style={decorate, decoration=snake}}
+
+\ExplSyntaxOn%
+\tl_gset:Nn \g_tumteaching_date_tl {WS~2018/19}
+\tl_gset:Nn \g_tumteaching_exsheet_nr_tl {4}
+\tl_gset:Nn \g_tumteaching_exsheet_deadline_tl {18.11.2018}
+\ExplSyntaxOff%
+
+\newcommand{\objective}[1]{\item \small{#1}}
+%\newcommand{\mydottedline}[0]{...}
+\newcommand{\mydotline}{\makebox[2.0in]{\dotfill}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+
+\begin{document}
+
+\verticalline
+\begin{disclaimer}{General Information}
+	Detailed information about the lecture, tutorials and homework assignments can be found on the lecture website\footnote{\url{https://www.in.tum.de/i02/lehre/wintersemester-1819/vorlesungen/functional-programming-and-verification/}}. Solutions have to be submitted to Moodle\footnote{\url{https://www.moodle.tum.de/course/view.php?id=44932}}. Make sure your uploaded documents are readable. Blurred images will be rejected. Use Piazza\footnote{\url{https://piazza.com/tum.de/fall2018/in0003/home}} to ask questions and discuss with your fellow students.
+\end{disclaimer}
+
+\verticalline
+\vspace*{-5mm}
+
+\begin{disclaimer}{Simplifications}
+	Make sure you simplify terms whenever possible. Overly complex proofs with huge formulas due to lack of any meaningful simplification will not be awarded with full points.
+\end{disclaimer}
+
+\verticalline
+\vspace*{-5mm}
+
+\begin{disclaimer}{OCaml Setup}
+	We are going to start OCaml programming in next week's exercises. Please prepare your machines accordingly and bring them to the sessions. A detailed installation guide will be published soon. Please check the website and Moodle.
+\end{disclaimer}
+
+\verticalline
+
+\begin{assignment}[L]{Termination}
+In the lecture, you have learned how to prove termination of a MiniJava program. Discuss these questions:
+	\begin{enumerate}
+		\item How can you decide whether a termination proof is required at all?
+		\item What is the basic idea of the termination proof?
+		\item How has the program to be modified?
+		\item What has to be proven?
+		\item How is the loop invariant influenced?
+	\end{enumerate}		
+
+	
+\end{assignment}
+
+\clearpage
+\begin{assignment}[L]{Counter Time}
+	Prove that the following program does indeed terminate for all inputs.
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg3.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+	\clearpage
+\end{assignment}
+
+\clearpage
+\begin{assignment}[L]{A Wavy Approach}
+	Prove termination of the following program:
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg1.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H,points=6]{Counting Twelves}
+	Prove termination of the following program:
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg5.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H,points=4]{aaaaaaaaaab}
+	Prove termination of the following program:
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg6.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H,points=10]{Term-ination}
+	Prove that the following program terminates for all inputs:
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg4.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+
+	\noindent\hint{Finding a formula for $r$ is non-trivial in this program. Make sure you understand what the program is doing and consider writing down the values of variables for a couple of iterations.}
+	
+	\noindent\hint{Keep in mind, that $r$ need not necessarily represent the exact number of remaining loop iterations, but a finite upper limit.}
+
+\end{assignment}
+
+\begin{comment}
+\begin{assignment}[H,points=8]{Name}
+TODO: fix, this does not terminate for negative n
+	\begin{center}
+		\begin{tikzpicture}
+			\input{cfg2.c.cfg.tex}
+		\end{tikzpicture}
+	\end{center}
+\end{assignment}
+\end{comment}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
