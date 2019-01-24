@@ -1,0 +1,370 @@
+\documentclass[
+  %solution,
+  english
+	%german
+]{tumteaching}
+
+\usepackage{listings}
+\usepackage{paralist}
+
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{braket}
+\usepackage[inline]{enumitem}
+\usepackage{amsmath,amsthm}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{centernot}
+\usepackage{multicol}
+\usepackage{adjustbox}
+\usepackage{ltablex}
+\usepackage{comment}
+\usepackage{svg}
+
+\usepackage{info2}
+
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{shapes.callouts}
+
+\tikzset{snake it/.style={decorate, decoration=snake}}
+
+\ExplSyntaxOn%
+\tl_gset:Nn \g_tumteaching_date_tl {WS~2018/19}
+\tl_gset:Nn \g_tumteaching_exsheet_nr_tl {12}
+\tl_gset:Nn \g_tumteaching_exsheet_deadline_tl {27.01.2019}
+\ExplSyntaxOff%
+
+\newcommand{\objective}[1]{\item \small{#1}}
+%\newcommand{\mydottedline}[0]{...}
+\newcommand{\mydotline}{\makebox[2.0in]{\dotfill}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcommand{\qsmio}[1]{\text{\mintinline{ocaml}{#1}}}
+
+\newcommand{\substrulexx}[1]{\overset{#1}{=}\hspace*{2.2mm}}
+\newcommand{\substrulexxx}[1]{\overset{#1}{=}\hspace*{1.4mm}}
+\newcommand{\substrulexxxx}[1]{\overset{#1}{=}\hspace*{0.7mm}}
+\newcommand{\substrulexxxxx}[1]{\overset{#1}{=}}
+\newcommand{\substempty}{=\hspace*{2.1mm}}
+\newcommand{\substmatch}{\substrulexxxxx{\qsmio{match}}}
+\newcommand{\substih}{\substrulexxxx{I.H.}\hspace*{0.1mm}}
+\newcommand{\substnamexx}[1]{\substrulexx{\qsmio{#1}}}
+\newcommand{\substnamexxx}[1]{\substrulexxx{\qsmio{#1}}}
+\newcommand{\substnamexxxx}[1]{\substrulexxxx{\qsmio{#1}}}
+\newcommand{\substlemma}[1]{\substrulexx{L#1}}
+
+
+
+\begin{document}
+
+\verticalline
+\begin{disclaimer}{General Information}
+	Detailed information about the lecture, tutorials and homework assignments can be found on the lecture website\footnote{\url{https://www.in.tum.de/i02/lehre/wintersemester-1819/vorlesungen/functional-programming-and-verification/}}. Solutions have to be submitted to Moodle\footnote{\url{https://www.moodle.tum.de/course/view.php?id=44932}}. Make sure your uploaded documents are readable. Blurred images will be rejected. Use Piazza\footnote{\url{https://piazza.com/tum.de/fall2018/in0003/home}} to ask questions and discuss with your fellow students.
+\end{disclaimer}
+
+%\verticalline
+%\vspace*{-5mm}
+
+%\begin{disclaimer}{Big-step proofs}
+%  Unless specified otherwise, all rules used in a big-step proof tree must be annotated and all axioms must be written down.
+%\end{disclaimer}
+
+\verticalline
+
+%\begin{disclaimer}{Functional Programming}
+%	Since this is a course about functional programming, we restrict ourselves to the functional features of OCaml. In other words: The imperative and object oriented subset of OCaml must not be used.
+%\end{disclaimer}
+
+%\vphantom{\begin{assignment}[L]{A} \end{assignment}}
+%\vphantom{\begin{assignment}[L]{A} \end{assignment}}
+%\vphantom{\begin{assignment}[L]{A} \end{assignment}}
+%\vphantom{\begin{assignment}[L]{A} \end{assignment}}
+%\vspace*{-10mm}
+
+\begin{assignment}[L]{What the fact}
+Consider the following function definitions:
+\begin{minted}{ocaml}
+let rec fact n = match n with 0 -> 1
+  | n -> n * fact (n-1)
+
+let rec fact_aux x n = match n with 0 -> x
+  | n -> fact_aux (n*x) (n-1)
+
+let fact_iter = fact_aux 1
+\end{minted}
+Assume that all expressions terminate. Show that
+\begin{align*}
+  \qsmio{fact_iter n = fact n}
+\end{align*}
+holds for all non-negative inputs $n \in \mathbb{N}_0$.
+
+\begin{solution}
+We show that \mio{fact_iter n = fact n}, resp. that \mio{fact_aux 1 n = fact n} by induction on \mio{n}.
+\begin{itemize}
+  \item Base case: \mio{n = 0}
+  \begin{align*}
+    &\;\qsmio{fact_aux 1 0}\\
+    \overset{\qsmio{f_a}}{=}\hspace*{1.5mm}&\;\qsmio{match 0 with 0 -> 1 | n -> fact_aux (n*1) (n-1)}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{1}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{match 0 with 0 -> 1 | n -> n * fact (n-1)}\\
+    \overset{\qsmio{fact}}{=}\hspace*{0.8mm}&\;\qsmio{fact 0}\\
+  \end{align*}
+
+  \item Inductive step: We assume \mio{fact_aux 1 n = fact n} holds for an input $n \geq 0$. Now we try to prove that it also holds for $n+1$:
+  \begin{align*}
+    &\;\qsmio{fact_aux 1 (n+1)}\\
+    \overset{\qsmio{f_a}}{=}\hspace*{1.5mm}&\;\qsmio{match n+1 with 0 -> 1 | n -> fact_aux (n*1) (n-1)}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{fact_aux ((n+1)*1) ((n+1)-1)}\\
+    \overset{arith}{=}\hspace*{0.2mm}&\;\qsmio{fact_aux (n+1) n}\\
+    &\;\mbox{\textcolor{red}{our proof fails here}}\\
+    =\hspace*{2.5mm}&\;\qsmio{(n+1) * fact n}\\
+    \overset{arith}{=}\hspace*{0.2mm}&\;\qsmio{(n+1) * fact ((n+1)-1)}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{match n+1 with 0 -> 1 | n -> n * fact (n-1)}\\
+    \overset{\qsmio{fact}}{=}\hspace*{0.8mm}&\;\qsmio{fact (n+1)}\\
+  \end{align*}
+\end{itemize}
+We fail, because we cannot use the induction hypothesis to rewrite one side into the other. The reason is that our hypothesis holds only for the special case where \mio{x} is exactly \mio{1}. Since the value of argument \mio{x} changes between recursive calls, we have to state (and prove) a more general equality between the two sides that holds for arbitrary \mio{x}. It is easy to see that \mio{x} is used as an accumulator here and the function simply multiplies the factorial of \mio{n} onto its initial value. Thus, for an arbitrary \mio{x}, \mio{fact_aux x n} computes $x*n!$. In order for the other side to compute the exact same value, we have also have to multiply by the initial value of \mio{x}:
+\begin{center}
+  \mio{fact_aux acc n = acc * fact n}
+\end{center}
+Now, we try to prove this by induction on \mio{n}:
+\begin{itemize}
+  \item Base case: \mio{n = 0}
+  \begin{align*}
+    &\;\qsmio{fact_aux acc 0}\\
+    \overset{\qsmio{f_a}}{=}\hspace*{1.5mm}&\;\qsmio{match 0 with 0 -> acc | n -> fact_aux (n*acc) (n-1)}\\
+    \overset{\qsmio{match}}{=}\hspace*{1.5mm}&\;\qsmio{acc}\\
+    \overset{arith}{=}&\;\qsmio{acc * 1}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{acc * match 0 with 0 -> 1 | n -> n * fact (n-1)}\\
+    \overset{\qsmio{fact}}{=}\hspace*{0.8mm}&\;\qsmio{acc * fact 0}\\
+  \end{align*}
+
+  \item Inductive step: We assume \mio{fact_aux acc n = acc * fact n} holds for an input $n \geq 0$. Now, we show that it holds for $n+1$ as well:
+  \begin{align*}
+    &\;\qsmio{fact_aux acc (n+1)}\\
+    \overset{\qsmio{f_a}}{=}\hspace*{1.5mm}&\;\qsmio{match n+1 with 0 -> acc | n -> fact_aux (n*acc) (n-1)}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{fact_aux ((n+1)*acc) ((n+1)-1)}\\
+    \overset{arith}{=}&\;\qsmio{fact_aux ((n+1)*acc) n}\\
+    \overset{I.H.}{=}\hspace*{-0.8mm}&\;\qsmio{(n+1) * acc * fact n}\\
+    \overset{arith}{=}&\;\qsmio{acc * (n+1) * fact ((n+1)-1)}\\
+    \overset{\qsmio{match}}{=}&\;\qsmio{acc * match n+1 with 0 -> 1 | n -> n * fact (n-1)}\\
+    \overset{\qsmio{fact}}{=}\hspace*{0.8mm}&\;\qsmio{acc * fact (n+1)}\\
+  \end{align*}
+\end{itemize}
+This proof succeeds, as we can now make use of the (more general) induction hypothesis. \qed
+
+\end{solution}
+\end{assignment}
+
+
+\begin{assignment}[L]{Arithmetic 101}
+  Let these functions be defined:
+  \begin{minted}{ocaml}
+let rec summa l = match l with [] -> 0
+    | h::t -> h + summa t
+
+let rec sum l a = match l with [] -> a
+    | h::t -> sum t (h+a)
+
+let rec mul i j a = if i <= 0 then a
+  else mul (i-1) j (j+a)
+  \end{minted}
+  Prove that, under the assumption that all expressions terminate, for arbitrary \mio{l} and $c \geq 0$ it holds that:
+  \begin{center}
+    \mio{mul c (sum l 0) 0 = c * summa l}
+  \end{center}
+
+  \begin{solution}
+    Both \mio{sum} and \mio{mul} use an accumulator in their tail recursive implementation. Thus, we have to generalize the claim to:
+    \begin{center}
+      \mio{mul c (sum l acc1) acc2 = acc2 + c * (acc1 + summa l)}
+    \end{center}
+    First we prove a lemma by induction on the length $n$ of the list \mio{l}:
+
+    \vspace*{3mm}
+    \noindent \textbf{Lemma 1:} \mio{sum l acc1 = acc1 + summa l}
+    \begin{itemize}
+      \item Base case: \mio{l = []}
+      \begin{align*}
+        &\;\qsmio{sum [] acc1}\\
+        \overset{\qsmio{sum}}{=}\hspace*{1.5mm}&\;\qsmio{match [] with [] -> acc1 | h::t -> sum t (h+acc1)}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{acc1}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{acc1 + match [] with [] -> 0 | h::t -> h + summa t}\\
+        \overset{\qsmio{summa}}{=}&\;\qsmio{acc1 + summa []}\\
+      \end{align*}
+      \item Inductive step: We assume \mio{sum l acc1 = acc1 + summa l} holds for a list \mio{xs} of length $n \geq 0$. Now, we show that it then also holds for a list \mio{x::xs} of length $n+1$:
+      \begin{align*}
+        &\;\qsmio{sum (x::xs) acc1}\\
+        \overset{\qsmio{sum}}{=}\hspace*{1.5mm}&\;\qsmio{match x::xs with [] -> acc1 | h::t -> sum t (h+acc1)}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{sum xs (x+acc1)}\\
+        \overset{I.H.}{=}\hspace*{-0.8mm}&\;\qsmio{x + acc1 + summa xs}\\
+        \overset{comm}{=}\hspace*{-0.8mm}&\;\qsmio{acc1 + x + summa xs}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{acc1 + match x::xs with [] -> 0 | h::t -> h + summa t}\\
+        \overset{\qsmio{summa}}{=}&\;\qsmio{acc1 + summa (x::xs)}\\
+      \end{align*}
+    \end{itemize}
+
+    \vspace*{3mm}
+    \noindent Next, we prove the initial statement by induction on $c$:
+    \begin{itemize}
+      \item Base case: \mio{c = 0}
+      \begin{align*}
+        &\;\qsmio{mul 0 (sum l acc1) acc2)}\\
+        \overset{\qsmio{mul}}{=}\hspace*{1.5mm}&\;\qsmio{if 0 <= 0 then acc2 else mul (0-1) (sum l acc1) ((sum l acc1)+acc2)}\\
+        \overset{\qsmio{if}}{=}\hspace*{2.2mm}&\;\qsmio{acc2}\\
+        \overset{arith}{=}\hspace*{0.2mm}&\;\qsmio{acc2 + 0 * (acc1 + summa l)}\\
+      \end{align*}
+
+      \item Inductive step: We assume the statement holds for a $c \geq 0$. Now, we show that it also holds for $c+1$:
+      \begin{align*}
+        &\;\qsmio{mul (c+1) (sum l acc1) acc2)}\\
+        \overset{\qsmio{mul}}{=}\hspace*{1.5mm}&\;\qsmio{if c+1 <= 0 then acc2 else mul c (sum l acc1) ((sum l acc1) + acc2)}\\
+        \overset{\qsmio{if}}{=}\hspace*{2.2mm}&\;\qsmio{mul c (sum l acc1) ((sum l acc1) + acc2)}\\
+        \overset{I.H.}{=}\hspace*{-.8mm}&\;\qsmio{(sum l acc1) + acc2 + c * (acc1 + summa l)}\\
+        \overset{comm}{=}\hspace*{-.8mm}&\;\qsmio{acc2 + c * (acc1 + summa l) + (sum l acc1)}\\
+        \overset{L.1}{=}\hspace*{1.5mm}&\;\qsmio{acc2 + c * (acc1 + summa l) + (acc1 + summa l)}\\
+        \overset{Distr}{=}&\;\qsmio{acc2 + (c+1) * (acc1 + summa l)}\\
+      \end{align*}
+    \end{itemize}
+    \noindent This proves the statement. \hfill \qed
+  \end{solution}
+\end{assignment}
+
+\begin{assignment}[L]{Counting nodes}
+  A binary tree and two functions to count the number of nodes in such a tree are defined as follows:
+  \begin{minted}{ocaml}
+type tree = Node of tree * tree | Empty
+
+let rec nodes t = match t with Empty -> 0
+    | Node (l,r) -> 1 + (nodes l) + (nodes r)
+
+let rec count t =
+  let rec aux t a = match t with Empty -> a
+      | Node (l,r) -> aux r (aux l (acc+1))
+  in
+  aux t 0
+  \end{minted}
+  Prove or disprove the following statement for arbitary trees \mio{t}:
+  \begin{center}
+    \mio{nodes t = count t}
+  \end{center}
+
+  \begin{solution}
+    The statement holds. First, we show that \mio{nodes t = aux t 0} or, more precisely, the generalized statement \mio{acc + nodes t = aux t acc} holds. We prove by induction on the structure of trees:
+    \begin{itemize}
+      \item Base case: \mio{t = Empty}
+      \begin{align*}
+        &\;\qsmio{acc + nodes Empty}\\
+        \overset{\qsmio{nodes}}{=}&\;\qsmio{acc + match Empty with Empty -> 0}\\
+        &\;\qquad\qsmio{| Node (l,r) -> 1 + (nodes l) + (nodes r)}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{acc}\\
+        \overset{\qsmio{match}}{=}&\;\qsmio{match Empty with Empty -> acc}\\
+        &\;\qquad\qsmio{| Node (l,r) -> aux r (aux l (acc+1))}\\
+        \overset{\qsmio{aux}}{=}\hspace*{1.5mm}&\;\qsmio{aux Empty acc}\\
+      \end{align*}
+
+      \item Inductive step: Assume the above equivalence holds for two trees \mio{a} and \mio{b}. Now, we show that it then also holds for a tree \mio{Node (a, b)}:
+        \begin{align*}
+          &\;\qsmio{acc + nodes (Node (a,b))}\\
+          \overset{\qsmio{nodes}}{=}&\;\qsmio{acc + match Node (a,b) with Empty -> 0}\\&\;\qquad\qsmio{| Node (l,r) -> 1 + (nodes l) + (nodes r)}\\
+          \overset{\qsmio{match}}{=}&\;\qsmio{acc + 1 + (nodes a) + (nodes b)}\\
+          \overset{I.H.}{=}\hspace*{-0.8mm}&\;\qsmio{aux b (acc + 1 + nodes a)}\\
+          \overset{I.H.}{=}\hspace*{-0.8mm}&\;\qsmio{aux b (aux a (acc+1))}\\
+          \overset{\qsmio{match}}{=}&\;\qsmio{match Node (a,b) with Empty -> acc | Node (l,r) -> aux r (aux l (acc+1))}\\
+          \overset{\qsmio{aux}}{=}\hspace*{1.5mm}&\;\qsmio{aux (Node (a,b)) acc}\\
+        \end{align*}
+    \end{itemize}
+
+    \vspace*{3mm}
+    \noindent Finally, we show:
+    \begin{center}
+      $\qsmio{nodes t} \qquad \overset{arith}{=} \qquad \qsmio{0 + nodes t} \qquad \overset{theor}{=} \qquad \qsmio{aux t 0} \qquad \overset{\qsmio{count}}{=} \qquad \qsmio{count t}$
+    \end{center}
+    \qed
+  \end{solution}
+\end{assignment}
+
+
+\begin{assignment}[H,points=5]{Len or nlen?}
+  The following functions are defined:
+  \begin{minted}{ocaml}
+let rec nlen n l = match l with [] -> 0
+  | h::t -> n + nlen n t
+
+let rec fold_left f a l = match l with [] -> a
+  | h::t -> fold_left f (f a h) t
+
+let rec map f l = match l with [] -> []
+  | h::t -> f h :: map f t
+
+let (+) a b = a + b
+  \end{minted}
+  Show that the statement
+  \begin{center}
+    \mio{nlen n l = fold_left (+) 0 (map (fun _ -> n) l)}
+  \end{center}
+  holds for arbitrary \mio{l} and \mio{n}. Assume that all expressions do terminate.
+
+\end{assignment}
+
+\begin{assignment}[H,points=8]{Fun with fold}
+  Given are the following functions with semantics as usual:
+  \begin{minted}{ocaml}
+let rec fl f a l = match l with [] -> a
+  | x::xs -> fl f (f a x) xs
+let rec fr f l a = match l with [] -> a
+  | x::xs -> f x (fr f xs a)
+let rec rev_map f l a = match l with [] -> a
+  | x::xs -> rev_map f xs (f x :: a)
+let (+) a b = a + b
+  \end{minted}
+  Prove that, if all expressions terminate, the statement
+  \begin{center}
+    \mio{fl (+) 0 (rev_map (fun x -> x * 2) l []) = fr (fun x a -> a + 2 * x) l 0}
+  \end{center}
+  holds for all inputs \mio{l}.
+
+\end{assignment}
+
+\clearpage
+\begin{assignment}[H,points=7]{Trees}
+  Once again, we define binary trees and some functions for them:
+  \begin{minted}{ocaml}
+type tree = Empty | Node of int * tree * tree
+
+let rec fl f a l = match l with [] -> a
+  | x::xs -> fl f (f a x) xs
+
+let rec app l1 l2 = match l1 with [] -> l2
+  | x::xs -> x::app xs l2
+
+let rec tf f b t = match t with Empty -> b
+  | Node (x, l, r) -> f (tf f b l) x (tf f b r)
+
+let rec to_list t = match t with Empty -> []
+  | Node (x, l, r) -> app (to_list l) (x::to_list r)
+
+let add3 a b c = a + b + c
+let (+) a b = a + b
+  \end{minted}
+  Assume all expressions terminate, then proof for all trees \mio{t}:
+  \begin{center}
+  \mio{fl (+) 0 (to_list t) = tf add3 0 t}
+  \end{center}
+
+  \vspace*{5mm}\noindent\hint{If you get stuck during your proof, try to formulate additional equalities that help to reach your goal. Don't forget to prove them, however!}
+
+\end{assignment}
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
