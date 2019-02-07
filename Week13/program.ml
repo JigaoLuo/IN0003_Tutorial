@@ -12,25 +12,17 @@ open Thread
 
 open Event (* creation of channels, sending and receiving *)
 
-(* let thread_function ch = let x = sync (receive ch)
+(* let thread_function ch = let x =  print_string "thread_function is running ...\n"; 
+                                  sync (receive ch)
                     in print_string (x ^ "\n");
                     sync (send ch " - receving done!");;
-            
-let main = 
-  let ch = new_channel () 
-  in 
-  create thread_function ch;
-  print_string "main is running ...\n";
-  sync (send ch "Message from main to thread_function  -  sending done!");  (** Send string to channel ch, another thread waits for this string**)
-  print_string ("Message fomr thread_function to main " ^ sync (receive ch) ^ "\n");; *)
-
 (* deadlock *)
-(* let main = 
+let main = 
+  print_string "main is running ...\n";
   let ch = new_channel () 
   in 
   let new_thread = create thread_function ch
   in
-  print_string "main is running ...\n";
   join new_thread;
   sync (send ch "Message from main to thread_function  -  sending done!");
   print_string ("Message fomr thread_function to main " ^ sync (receive ch) ^ "\n");; *)
@@ -56,7 +48,7 @@ run_counters 3 10;; *)
 
 
 (* version 2: main thread orchestration *)
-(* let spawn_counter n ch =
+let spawn_counter n ch =
   let rec count i =
     let _ = sync (receive ch) in
     let s = Printf.sprintf "Thread %2d: %d" (id (self ())) i 
@@ -72,10 +64,12 @@ run_counters 3 10;; *)
 
 let run_counters m n =
   let channels = List.init m (fun _ -> new_channel ()) in
-  let counters = List.map (spawn_counter n) channels in (** every thread has a channel*)
+  let counters = List.map (spawn_counter n) channels in 
+  (** every thread has a channel*)
   let rec run l = 
     match l with [] -> ()
-              | c::cs -> sync (send c true);  (** I still have element in list *)
+              | c::cs -> sync (send c true);  
+              (** I still have element in list *)
                          let chans = if sync (receive c) then cs @ [c] else cs 
                          in
                          run chans
@@ -84,7 +78,7 @@ let run_counters m n =
   List.iter join counters;
   print_endline "end"
 
-let _ = run_counters 3 10 *)
+let _ = run_counters 3 10
 
 
 (* 13.2 *)
@@ -101,16 +95,19 @@ let start_server users =
   let c = new_channel () 
   in
     let rec server_fun blogs =
-      let get_blog user =  (**match user name and blogs - like hash table - blogs are just string list *)
+      let get_blog user =  
+      (**match user name and blogs - like hash table - blogs are just string list *)
                 match List.assoc_opt user blogs with
                   None -> [] 
                 | Some b' -> b' 
       in
-      match sync (receive c) with (**listen to channel *)
+      match sync (receive c) with 
+      (**listen to channel *)
               | Post (user, pass, text) ->
                 if List.assoc_opt user users = Some pass  (** matched then login *)
                 then
-                  server_fun ((user, get_blog user @ [text])::List.remove_assoc user blogs)  (**update the blog, no dulicates *)
+                  server_fun ((user, get_blog user @ [text])::
+                  List.remove_assoc user blogs)  (**update the blog, no dulicates *)
                 else server_fun blogs (**stay unchanged *)
               | Read (user, answer_c) ->
                 sync (send answer_c (get_blog user));

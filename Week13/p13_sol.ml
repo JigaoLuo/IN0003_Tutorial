@@ -25,16 +25,16 @@ let run_counters m n =
 
 
 (* version 2: main thread orchestration *)
-let spawn_counter n c =
+let spawn_counter n ch =
   let rec count i =
-    let _ = sync (receive c) in
+    let _ = sync (receive ch) in
     let s = Printf.sprintf "Thread %2d: %d" (id (self ())) i in
     print_endline s;
     if i < n then
-      (sync (send c true);
+      (sync (send ch true);
       count (i+1))
     else
-      (sync (send c false))
+      (sync (send ch false))
   in
   create count 0
 
